@@ -106,8 +106,9 @@ class AhoCorasick:
         words = {}
         node = ''
         tree = self.tree_words
+        dummy_str = string
 
-        while len(string) > 0:
+        while len(dummy_str) > 0:
             word_suffix_link = tree[node]['word_suffix_link']
 
             if word_suffix_link:
@@ -115,8 +116,8 @@ class AhoCorasick:
             else:
                 for child in tree[node]['childs']:
                     if (
-                        string.find(child) == 0
-                        or string.find(
+                        dummy_str.find(child) == 0
+                        or dummy_str.find(
                             child[-1:]
                         ) == 0
                     ):
@@ -124,7 +125,7 @@ class AhoCorasick:
                         break
                 else:
                     if node == '':
-                        string = string[1:]
+                        dummy_str = dummy_str[1:]
                     else:
                         node = tree[node]['suffix_link']
 
@@ -132,8 +133,8 @@ class AhoCorasick:
                 if (
                     tree[node]['in_words'] is True
                     and (
-                        string.find(node) == 0
-                        or string.find(
+                        dummy_str.find(node) == 0
+                        or dummy_str.find(
                             node[-1:]
                         ) == 0
                     )
@@ -155,7 +156,7 @@ class AhoCorasick:
                         else:
                             words[word_suffix_link] = 1
 
-                    string = string[1:]
+                    dummy_str = dummy_str[1:]
 
         return words
 
