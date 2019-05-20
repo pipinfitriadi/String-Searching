@@ -9,7 +9,7 @@ class AhoCorasick:
     Alfred V. Aho and Margaret J. Corasick.
 
     Implemented by Pipin Fitriadi (pipinfitriadi@gmail.com) at May 19th, 2019
-    and updated at May 20th, 2019.
+    and updated at May 21th, 2019.
 
     Source: https://en.wikipedia.org/wiki/Aho%E2%80%93Corasick_algorithm
     """
