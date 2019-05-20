@@ -14,7 +14,10 @@ class AhoCorasick:
     Source: https://en.wikipedia.org/wiki/Aho%E2%80%93Corasick_algorithm
     """
 
-    def __init__(self, words, tree_words={}):
+    def __init__(self, words):
+        self.tree_words = self.__tree_words(words, {})
+
+    def __tree_words(self, words, tree_words={}):
         if tree_words:
             recursive = True
         else:
@@ -54,10 +57,10 @@ class AhoCorasick:
                     parent = word[:-1]
 
                     if parent not in tree_words:
-                        tree_words = AhoCorasick(
+                        tree_words = self.__tree_words(
                             [parent],
                             tree_words
-                        ).tree_words
+                        )
 
                 tree_words[parent]['childs'] = list(
                     set(
@@ -114,7 +117,7 @@ class AhoCorasick:
 
                     tree_words[word]['word_suffix_link'] = word_suffix_link
 
-        self.tree_words = tree_words
+        return tree_words
 
     def find_in(self, string):
         words = {}
@@ -244,8 +247,7 @@ class Test(TestCase):
     def test_AhoCorasick_tree_words_1(self):
         self.assertEqual(
             AhoCorasick(
-                [''],
-                {}
+                ['']
             ).is_tree_words_equal_to(
                 {
                     '': {
@@ -262,8 +264,7 @@ class Test(TestCase):
     def test_AhoCorasick_tree_words_2(self):
         self.assertEqual(
             AhoCorasick(
-                'a ab',
-                {}
+                'a ab'
             ).is_tree_words_equal_to(
                 {
                     '': {
@@ -294,8 +295,7 @@ class Test(TestCase):
             AhoCorasick(
                 [
                     'a', 'ab', 'bab', 'bc', 'bca', 'c', 'caa'
-                ],
-                {}
+                ]
             ).is_tree_words_equal_to(
                 {
                     '': {
@@ -374,8 +374,7 @@ class Test(TestCase):
             AhoCorasick(
                 [
                     'a', 'ab', 'bab', 'bc', 'bca', 'c', 'caa'
-                ],
-                {}
+                ]
             ).are_words_found_equal_to(
                 'abccab',
                 {
@@ -393,8 +392,7 @@ class Test(TestCase):
             AhoCorasick(
                 [
                     'b', 'c', 'aa', 'd', 'b'
-                ],
-                {}
+                ]
             ).are_words_found_equal_to(
                 'caaab',
                 {
@@ -409,13 +407,3 @@ class Test(TestCase):
 
 if __name__ == '__main__':
     main()
-    # from json import dumps
-
-    # print(
-    #     dumps(
-    #         AhoCorasick(
-    #             'a ab'
-    #         ).tree_words,
-    #         indent=4
-    #     )
-    # )
