@@ -113,14 +113,11 @@ class AhoCorasick:
                 node = tree[node]['suffix_link']
             else:
                 for child in tree[node]['childs']:
-                    suffix_link = tree[child]['suffix_link']
-
                     if (
                         string.find(child) == 0
-                        or (
-                            suffix_link != ''
-                            and string.find(suffix_link) == 0
-                        )
+                        or string.find(
+                            child[-1:]
+                        ) == 0
                     ):
                         node = child
                         break
@@ -131,16 +128,13 @@ class AhoCorasick:
                         node = tree[node]['suffix_link']
 
             if node != '':
-                suffix_link = tree[node]['suffix_link']
-
                 if (
                     tree[node]['in_words'] is True
                     and (
                         string.find(node) == 0
-                        or (
-                            suffix_link != ''
-                            and string.find(suffix_link) == 0
-                        )
+                        or string.find(
+                            node[-1:]
+                        ) == 0
                     )
                 ):
                     words_node = words.get(node)
