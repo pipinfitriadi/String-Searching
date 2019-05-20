@@ -204,7 +204,7 @@ class AhoCorasick:
 
         return True
 
-    def is_words_found_equal_to(self, string, words: dict):
+    def are_words_found_equal_to(self, string, words: dict):
         w1 = self.find_in(string)
         w2 = words
         w1_keys = w1.keys()
@@ -222,7 +222,7 @@ class AhoCorasick:
 
 
 class Test(TestCase):
-    def test_tree_words(self):
+    def test_AhoCorasick_tree_words(self):
         self.assertEqual(
             AhoCorasick(
                 [
@@ -302,14 +302,14 @@ class Test(TestCase):
             True
         )
 
-    def test_words_found_1(self):
+    def test_AhoCorasick_words_found_1(self):
         self.assertEqual(
             AhoCorasick(
                 [
                     'a', 'ab', 'bab', 'bc', 'bca', 'c', 'caa'
                 ],
                 {}
-            ).is_words_found_equal_to(
+            ).are_words_found_equal_to(
                 'abccab',
                 {
                     'a': 2,
@@ -321,14 +321,14 @@ class Test(TestCase):
             True
         )
 
-    def test_words_found_2(self):
+    def test_AhoCorasick_words_found_2(self):
         self.assertEqual(
             AhoCorasick(
                 [
                     'b', 'c', 'aa', 'd', 'b'
                 ],
                 {}
-            ).is_words_found_equal_to(
+            ).are_words_found_equal_to(
                 'caaab',
                 {
                     'aa': 2,
