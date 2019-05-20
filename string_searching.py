@@ -211,9 +211,17 @@ class AhoCorasick:
             return False
         elif w1_keys != w2.keys():
             return False
-        else:
-            for key in w1_keys:
-                if w1[key] != w2[key]:
+
+        for key in w1_keys:
+            get_w1_key = w1[key]
+            get_w2_key = w2[key]
+            len_w1_key = len(get_w1_key)
+
+            if len_w1_key != len(w2[key]):
+                return False
+
+            for k in range(len_w1_key):
+                if get_w1_key[k] != get_w2_key[k]:
                     return False
 
         return True
@@ -310,10 +318,10 @@ class Test(TestCase):
             ).are_words_found_equal_to(
                 'abccab',
                 {
-                    'a': 2,
-                    'ab': 2,
-                    'bc': 1,
-                    'c': 2
+                    'a': [0, 4],
+                    'ab': [0, 4],
+                    'bc': [1],
+                    'c': [2, 3]
                 }
             ),
             True
@@ -329,9 +337,9 @@ class Test(TestCase):
             ).are_words_found_equal_to(
                 'caaab',
                 {
-                    'aa': 2,
-                    'b': 1,
-                    'c': 1
+                    'aa': [1, 2],
+                    'b': [4],
+                    'c': [0]
                 }
             ),
             True
@@ -339,16 +347,16 @@ class Test(TestCase):
 
 
 if __name__ == '__main__':
-    # main()
-    from json import dumps
+    main()
+    # from json import dumps
 
-    print(
-        dumps(
-            AhoCorasick(
-                [
-                    'b', 'c', 'aa', 'd', 'b'
-                ]
-            ).find_in('caaab'),
-            indent=4
-        )
-    )
+    # print(
+    #     dumps(
+    #         AhoCorasick(
+    #             [
+    #                 'a', 'ab', 'bab', 'bc', 'bca', 'c', 'caa'
+    #             ]
+    #         ).find_in('abccab'),
+    #         indent=4
+    #     )
+    # )
