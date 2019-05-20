@@ -27,6 +27,9 @@ class AhoCorasick:
 
         words = set(words)
 
+        if '' in words:
+            words.remove('')
+
         for word in words:
             if word not in tree_words:
                 tree_words[word] = {
@@ -227,7 +230,25 @@ class AhoCorasick:
 
 
 class Test(TestCase):
-    def test_AhoCorasick_tree_words(self):
+    def test_AhoCorasick_tree_words_1(self):
+        self.assertEqual(
+            AhoCorasick(
+                [''],
+                {}
+            ).is_tree_words_equal_to(
+                {
+                    '': {
+                        'childs': [],
+                        'in_words': False,
+                        'word_suffix_link': None,
+                        'suffix_link': None
+                    }
+                }
+            ),
+            True
+        )
+
+    def test_AhoCorasick_tree_words_2(self):
         self.assertEqual(
             AhoCorasick(
                 [
@@ -346,16 +367,16 @@ class Test(TestCase):
 
 
 if __name__ == '__main__':
-    main()
-    # from json import dumps
+    # main()
+    from json import dumps
 
-    # print(
-    #     dumps(
-    #         AhoCorasick(
-    #             [
-    #                 'a', 'ab', 'bab', 'bc', 'bca', 'c', 'caa'
-    #             ]
-    #         ).find_in('abccab'),
-    #         indent=4
-    #     )
-    # )
+    print(
+        dumps(
+            AhoCorasick(
+                [
+                    'a', 'ab', 'bab', 'bc', 'bca', 'c', 'caa'
+                ]
+            ).tree_words,
+            indent=4
+        )
+    )
