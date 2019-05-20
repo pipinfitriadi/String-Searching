@@ -104,59 +104,56 @@ class AhoCorasick:
 
     def find_in(self, string):
         words = {}
-        node = ''
         tree = self.tree_words
+
+        if len(tree) == 1:
+            return words
+
+        node = ''
+        position = 0
         dummy_str = string
 
-        while len(dummy_str) > 0:
-            word_suffix_link = tree[node]['word_suffix_link']
-
-            if word_suffix_link:
-                node = tree[node]['suffix_link']
+        while len(dummy_str):
+            for child in tree[node]['childs']:
+                if dummy_str.find(child) == 0:
+                    node = child
+                    break
             else:
-                for child in tree[node]['childs']:
-                    if (
-                        dummy_str.find(child) == 0
-                        or dummy_str.find(
-                            child[-1:]
-                        ) == 0
-                    ):
-                        node = child
-                        break
-                else:
-                    if node == '':
-                        dummy_str = dummy_str[1:]
-                    else:
-                        node = tree[node]['suffix_link']
+                node = tree[node]['suffix_link']
 
-            if node != '':
-                if (
-                    tree[node]['in_words'] is True
-                    and (
-                        dummy_str.find(node) == 0
-                        or dummy_str.find(
-                            node[-1:]
-                        ) == 0
-                    )
-                ):
-                    words_node = words.get(node)
-
-                    if words_node:
-                        words[node] += 1
-                    else:
-                        words[node] = 1
-
+            if node:
+                if dummy_str.find(node) == 0:
                     word_suffix_link = tree[node]['word_suffix_link']
 
-                    if word_suffix_link:
-                        words_suffix_link = words.get(word_suffix_link)
+                    if tree[node]['in_words'] is True:
+                        get_node = words.get(node)
 
-                        if words_suffix_link:
-                            words[word_suffix_link] += 1
+                        if get_node:
+                            if position not in get_node:
+                                words[node].append(position)
                         else:
-                            words[word_suffix_link] = 1
+                            words[node] = [position]
 
-                    dummy_str = dummy_str[1:]
+                        if not tree[node]['childs']:
+                            node = tree[node]['suffix_link']
+                            position += 1
+                            dummy_str = dummy_str[1:]
+
+                    if word_suffix_link:
+                        get_word_suffix = words.get(word_suffix_link)
+                        w_position = position + 1
+
+                        if get_word_suffix:
+                            if w_position not in get_word_suffix:
+                                words[word_suffix_link].append(w_position)
+                        else:
+                            words[word_suffix_link] = [w_position]
+
+                        position += 1
+                        dummy_str = dummy_str[1:]
+            else:
+                position += 1
+                dummy_str = dummy_str[1:]
 
         return words
 
@@ -342,4 +339,16 @@ class Test(TestCase):
 
 
 if __name__ == '__main__':
-    main()
+    # main()
+    from json import dumps
+
+    print(
+        dumps(
+            AhoCorasick(
+                [
+                    'b', 'c', 'aa', 'd', 'b'
+                ]
+            ).find_in('caaab'),
+            indent=4
+        )
+    )
