@@ -111,18 +111,17 @@ class AhoCorasick:
 
         node = ''
         position = 0
-        dummy_str = string
 
-        while len(dummy_str):
+        while len(string):
             for child in tree[node]['childs']:
-                if dummy_str.find(child) == 0:
+                if string.find(child) == 0:
                     node = child
                     break
             else:
                 node = tree[node]['suffix_link']
 
             if node:
-                if dummy_str.find(node) == 0:
+                if string.find(node) == 0:
                     word_suffix_link = tree[node]['word_suffix_link']
 
                     if tree[node]['in_words'] is True:
@@ -137,7 +136,7 @@ class AhoCorasick:
                         if not tree[node]['childs']:
                             node = tree[node]['suffix_link']
                             position += 1
-                            dummy_str = dummy_str[1:]
+                            string = string[1:]
 
                     if word_suffix_link:
                         get_word_suffix = words.get(word_suffix_link)
@@ -150,10 +149,10 @@ class AhoCorasick:
                             words[word_suffix_link] = [w_position]
 
                         position += 1
-                        dummy_str = dummy_str[1:]
+                        string = string[1:]
             else:
                 position += 1
-                dummy_str = dummy_str[1:]
+                string = string[1:]
 
         return words
 
