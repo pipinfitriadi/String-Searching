@@ -275,14 +275,14 @@ class Test(TestCase):
                     'a': {
                         'childs': ['ab'],
                         'in_words': True,
-                        'word_suffix_link': '',
-                        'suffix_link': None
+                        'word_suffix_link': None,
+                        'suffix_link': ''
                     },
                     'ab': {
                         'childs': [],
                         'in_words': True,
-                        'word_suffix_link': '',
-                        'suffix_link': None
+                        'word_suffix_link': None,
+                        'suffix_link': ''
                     }
                 }
             ),
@@ -408,14 +408,14 @@ class Test(TestCase):
 
 
 if __name__ == '__main__':
-    # main()
-    from json import dumps
+    main()
+    # from json import dumps
 
-    print(
-        dumps(
-            AhoCorasick(
-                'a aa'
-            ).tree_words,
-            indent=4
-        )
-    )
+    # print(
+    #     dumps(
+    #         AhoCorasick(
+    #             'a ab'
+    #         ).tree_words,
+    #         indent=4
+    #     )
+    # )
