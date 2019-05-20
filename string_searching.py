@@ -130,12 +130,13 @@ class AhoCorasick:
         position = 0
 
         while len(string):
-            for child in tree[node]['childs']:
-                if string.find(child) == 0:
-                    node = child
-                    break
-            else:
-                node = tree[node]['suffix_link']
+            if node is not None:
+                for child in tree[node]['childs']:
+                    if string.find(child) == 0:
+                        node = child
+                        break
+                else:
+                    node = tree[node]['suffix_link']
 
             if node:
                 if string.find(node) == 0:
