@@ -8,7 +8,8 @@ class AhoCorasick:
     the Aho–Corasick algorithm is a string-searching algorithm invented by
     Alfred V. Aho and Margaret J. Corasick.
 
-    Implemented by Pipin Fitriadi (pipinfitriadi@gmail.com) at May 19th, 2019.
+    Implemented by Pipin Fitriadi (pipinfitriadi@gmail.com) at May 19th, 2019
+    and updated at May 20th, 2019.
 
     Source: https://en.wikipedia.org/wiki/Aho%E2%80%93Corasick_algorithm
     """
@@ -296,7 +297,7 @@ class Test(unittest.TestCase):
             True
         )
 
-    def test_words_found(self):
+    def test_words_found_1(self):
         self.assertEqual(
             AhoCorasick([
                 'a', 'ab', 'bab', 'bc', 'bca', 'c', 'caa'
@@ -312,21 +313,21 @@ class Test(unittest.TestCase):
             True
         )
 
+    def test_words_found_2(self):
+        self.assertEqual(
+            AhoCorasick([
+                'b', 'c', 'aa', 'd', 'b'
+            ]).is_words_found_equal_to(
+                'caaab',
+                {
+                    'aa': 2,
+                    'b': 1,
+                    'c': 1
+                }
+            ),
+            True
+        )
+
 
 if __name__ == '__main__':
-    # unittest.main()
-
-    from json import dumps
-
-    genes = AhoCorasick([
-        'b', 'c', 'aa', 'd', 'b'
-    ])
-    print(
-        dumps(
-            {
-                'tree_words': genes.tree_words,
-                'words_found': genes.find_in('caaab')
-            },
-            indent=4
-        )
-    )
+    unittest.main()
