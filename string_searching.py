@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import unittest
+from unittest import main, TestCase
 
 
 class AhoCorasick:
@@ -221,87 +221,95 @@ class AhoCorasick:
         return True
 
 
-class Test(unittest.TestCase):
+class Test(TestCase):
     def test_tree_words(self):
         self.assertEqual(
-            AhoCorasick([
-                'a', 'ab', 'bab', 'bc', 'bca', 'c', 'caa'
-            ]).is_tree_words_equal_to({
-                '': {
-                    'childs': ['a', 'b', 'c'],
-                    'in_words': False,
-                    'suffix_link': None,
-                    'word_suffix_link': None
-                },
-                'a': {
-                    'childs': ['ab'],
-                    'in_words': True,
-                    'suffix_link': '',
-                    'word_suffix_link': None
-                },
-                'b': {
-                    'childs': ['ba', 'bc'],
-                    'in_words': False,
-                    'suffix_link': '',
-                    'word_suffix_link': None
-                },
-                'c': {
-                    'childs': ['ca'],
-                    'in_words': True,
-                    'suffix_link': '',
-                    'word_suffix_link': None
-                },
-                'ab': {
-                    'childs': [],
-                    'in_words': True,
-                    'suffix_link': 'b',
-                    'word_suffix_link': None
-                },
-                'ba': {
-                    'childs': ['bab'],
-                    'in_words': False,
-                    'suffix_link': 'a',
-                    'word_suffix_link': 'a'
-                },
-                'bc': {
-                    'childs': ['bca'],
-                    'in_words': True,
-                    'suffix_link': 'c',
-                    'word_suffix_link': 'c'
-                },
-                'ca': {
-                    'childs': ['caa'],
-                    'in_words': False,
-                    'suffix_link': 'a',
-                    'word_suffix_link': 'a'
-                },
-                'bab': {
-                    'childs': [],
-                    'in_words': True,
-                    'suffix_link': 'ab',
-                    'word_suffix_link': 'ab'
-                },
-                'bca': {
-                    'childs': [],
-                    'in_words': True,
-                    'suffix_link': 'ca',
-                    'word_suffix_link': 'a'
-                },
-                'caa': {
-                    'childs': [],
-                    'in_words': True,
-                    'suffix_link': 'a',
-                    'word_suffix_link': 'a'
+            AhoCorasick(
+                [
+                    'a', 'ab', 'bab', 'bc', 'bca', 'c', 'caa'
+                ],
+                {}
+            ).is_tree_words_equal_to(
+                {
+                    '': {
+                        'childs': ['a', 'b', 'c'],
+                        'in_words': False,
+                        'suffix_link': None,
+                        'word_suffix_link': None
+                    },
+                    'a': {
+                        'childs': ['ab'],
+                        'in_words': True,
+                        'suffix_link': '',
+                        'word_suffix_link': None
+                    },
+                    'b': {
+                        'childs': ['ba', 'bc'],
+                        'in_words': False,
+                        'suffix_link': '',
+                        'word_suffix_link': None
+                    },
+                    'c': {
+                        'childs': ['ca'],
+                        'in_words': True,
+                        'suffix_link': '',
+                        'word_suffix_link': None
+                    },
+                    'ab': {
+                        'childs': [],
+                        'in_words': True,
+                        'suffix_link': 'b',
+                        'word_suffix_link': None
+                    },
+                    'ba': {
+                        'childs': ['bab'],
+                        'in_words': False,
+                        'suffix_link': 'a',
+                        'word_suffix_link': 'a'
+                    },
+                    'bc': {
+                        'childs': ['bca'],
+                        'in_words': True,
+                        'suffix_link': 'c',
+                        'word_suffix_link': 'c'
+                    },
+                    'ca': {
+                        'childs': ['caa'],
+                        'in_words': False,
+                        'suffix_link': 'a',
+                        'word_suffix_link': 'a'
+                    },
+                    'bab': {
+                        'childs': [],
+                        'in_words': True,
+                        'suffix_link': 'ab',
+                        'word_suffix_link': 'ab'
+                    },
+                    'bca': {
+                        'childs': [],
+                        'in_words': True,
+                        'suffix_link': 'ca',
+                        'word_suffix_link': 'a'
+                    },
+                    'caa': {
+                        'childs': [],
+                        'in_words': True,
+                        'suffix_link': 'a',
+                        'word_suffix_link': 'a'
+                    }
                 }
-            }),
+            ),
             True
         )
 
     def test_words_found_1(self):
         self.assertEqual(
-            AhoCorasick([
-                'a', 'ab', 'bab', 'bc', 'bca', 'c', 'caa'
-            ]).is_words_found_equal_to(
+            AhoCorasick(
+                [
+                    'a', 'ab', 'bab', 'bc', 'bca', 'c', 'caa'
+                ],
+                {}
+            ).is_words_found_equal_to(
                 'abccab',
                 {
                     'a': 2,
@@ -315,9 +323,12 @@ class Test(unittest.TestCase):
 
     def test_words_found_2(self):
         self.assertEqual(
-            AhoCorasick([
-                'b', 'c', 'aa', 'd', 'b'
-            ]).is_words_found_equal_to(
+            AhoCorasick(
+                [
+                    'b', 'c', 'aa', 'd', 'b'
+                ],
+                {}
+            ).is_words_found_equal_to(
                 'caaab',
                 {
                     'aa': 2,
@@ -330,4 +341,4 @@ class Test(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()
+    main()
