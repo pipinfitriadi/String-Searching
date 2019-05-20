@@ -102,28 +102,33 @@ class AhoCorasick:
         self.tree_words = tree_words
 
     def find_in(self, string):
-        words = []
+        words = {}
         node = ''
         tree = self.tree_words
 
         while len(string) > 0:
-            for child in tree[node]['childs']:
-                suffix_link = tree[child]['suffix_link']
+            word_suffix_link = tree[node]['word_suffix_link']
 
-                if (
-                    string.find(child) == 0
-                    or (
-                        suffix_link != ''
-                        and string.find(suffix_link) == 0
-                    )
-                ):
-                    node = child
-                    break
+            if word_suffix_link:
+                node = tree[node]['suffix_link']
             else:
-                if node == '':
-                    string = string[1:]
+                for child in tree[node]['childs']:
+                    suffix_link = tree[child]['suffix_link']
+
+                    if (
+                        string.find(child) == 0
+                        or (
+                            suffix_link != ''
+                            and string.find(suffix_link) == 0
+                        )
+                    ):
+                        node = child
+                        break
                 else:
-                    node = ''
+                    if node == '':
+                        string = string[1:]
+                    else:
+                        node = tree[node]['suffix_link']
 
             if node != '':
                 suffix_link = tree[node]['suffix_link']
@@ -138,14 +143,30 @@ class AhoCorasick:
                         )
                     )
                 ):
-                    words.append(node)
+                    words_node = words.get(node)
+
+                    if words_node:
+                        words[node] += 1
+                    else:
+                        words[node] = 1
+
+                    word_suffix_link = tree[node]['word_suffix_link']
+
+                    if word_suffix_link:
+                        words_suffix_link = words.get(word_suffix_link)
+
+                        if words_suffix_link:
+                            words[word_suffix_link] += 1
+                        else:
+                            words[word_suffix_link] = 1
+
                     string = string[1:]
 
         return words
 
-    def is_tree_words_equal_to(self, tree_words: dict):
+    def is_tree_words_equal_to(self, another_tree_words: dict):
         t1 = self.tree_words
-        t2 = tree_words
+        t2 = another_tree_words
 
         if len(t1) != len(t2):
             return False
@@ -185,6 +206,22 @@ class AhoCorasick:
                         return False
                     elif set(t1_node_key) != set(t2_node_key):
                         return False
+
+        return True
+
+    def is_words_found_equal_to(self, string, words: dict):
+        w1 = self.find_in(string)
+        w2 = words
+        w1_keys = w1.keys()
+
+        if len(w1) != len(w2):
+            return False
+        elif w1_keys != w2.keys():
+            return False
+        else:
+            for key in w1_keys:
+                if w1[key] != w2[key]:
+                    return False
 
         return True
 
@@ -265,6 +302,22 @@ class Test(unittest.TestCase):
             True
         )
 
+    def test_words_found(self):
+        self.assertEqual(
+            AhoCorasick([
+                'a', 'ab', 'bab', 'bc', 'bca', 'c', 'caa'
+            ]).is_words_found_equal_to(
+                'abccab',
+                {
+                    'a': 2,
+                    'ab': 2,
+                    'bc': 1,
+                    'c': 2
+                }
+            ),
+            True
+        )
+
 
 if __name__ == '__main__':
     # unittest.main()
@@ -272,11 +325,14 @@ if __name__ == '__main__':
     from json import dumps
 
     genes = AhoCorasick([
-        'a', 'ab', 'bab', 'bc', 'bca', 'c', 'caa'
+        'b', 'c', 'aa', 'd', 'b'
     ])
     print(
         dumps(
-            genes.find_in('abccab'),
+            {
+                'tree_words': genes.tree_words,
+                'words_found': genes.find_in('caaab')
+            },
             indent=4
         )
     )
