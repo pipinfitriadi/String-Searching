@@ -2,7 +2,6 @@
 
 from unittest import main, TestCase
 
-
 class AhoCorasick:
     """
     the Aho–Corasick algorithm is a string-searching algorithm invented by
