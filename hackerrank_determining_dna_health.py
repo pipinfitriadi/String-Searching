@@ -4,8 +4,7 @@
 Hackerrank: Determining DNA Health
 URL: https://www.hackerrank.com/challenges/determining-dna-health/problem
 
-Try to be solved by Pipin Fitriadi (pipinfitriadi@gmail.com) at May 21th, 2019
-and updated at May 21th, 2019.
+Try to be solved by Pipin Fitriadi (pipinfitriadi@gmail.com) at May 21th.
 """
 
 
