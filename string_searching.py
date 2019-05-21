@@ -138,6 +138,12 @@ class AhoCorasick:
                 else:
                     node = tree[node]['suffix_link']
 
+                    if node == '':
+                        position += 1
+                        string = string[1:]
+            else:
+                node = ''
+
             if node:
                 if string.find(node) == 0:
                     word_suffix_link = tree[node]['word_suffix_link']
@@ -168,7 +174,7 @@ class AhoCorasick:
 
                         position += 1
                         string = string[1:]
-            else:
+            elif node is None:
                 position += 1
                 string = string[1:]
 
