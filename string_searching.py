@@ -1,6 +1,15 @@
 #!/usr/bin/env python3
 
-from unittest import main, TestCase
+# from unittest import main, TestCase
+
+
+class Node:
+    def __init__(self, key: str = '', in_keys: bool = False):
+        self.path = key
+        self.in_keys = in_keys
+        self.suffix_link: Node = None
+        self.key_suffix_link: Node = None
+        self.childs = []
 
 
 class AhoCorasick:
@@ -9,408 +18,253 @@ class AhoCorasick:
     Alfred V. Aho and Margaret J. Corasick.
 
     Implemented by Pipin Fitriadi (pipinfitriadi@gmail.com) at May 19th, 2019
-    and updated at May 21th, 2019.
+    and updated at May 23th, 2019.
 
     Source: https://en.wikipedia.org/wiki/Aho%E2%80%93Corasick_algorithm
     """
 
-    def __init__(self, words):
-        self.tree_words = self.__tree_words(words, {})
+    def __init__(self, keys: list):
+        self.tree_node = self.__tree_node(keys)
 
-    def __tree_words(self, words, tree_words={}):
-        if tree_words:
-            recursive = True
-        else:
-            recursive = False
-            tree_words[''] = {
-                'childs': [],
-                'in_words': False,
-                'word_suffix_link': None
-            }
+    def __tree_node(self, keys: list) -> Node:
+        root = Node()
+        return root
 
-        is_words_type_acceptable = True
+    def find_in(self, text: str):
+        pass
 
-        if isinstance(words, str):
-            words = words.split(' ')
-        elif (
-            not isinstance(words, list)
-            and not isinstance(words, tuple)
-        ):
-            is_words_type_acceptable = False
+    # def is_tree_words_equal_to(self, another_tree_words: dict):
+    #     t1 = self.tree_words
+    #     t2 = another_tree_words
 
-        if is_words_type_acceptable:
-            words = set(words)
+    #     if len(t1) != len(t2):
+    #         return False
+    #     elif t1.keys() != t2.keys():
+    #         return False
 
-            if '' in words:
-                words.remove('')
+    #     for node in t1.keys():
+    #         t1_node = t1[node]
+    #         t1_node_keys = t1_node.keys()
+    #         t2_node = t2[node]
 
-            for word in words:
-                if word not in tree_words:
-                    tree_words[word] = {
-                        'childs': [],
-                        'in_words': False
-                    }
+    #         if len(t1_node) != len(t2_node):
+    #             return False
+    #         elif (
+    #             t1_node_keys
+    #             != t2_node.keys()
+    #             != {
+    #                 'childs',
+    #                 'in_words',
+    #                 'suffix_link',
+    #                 'word_suffix_link'
+    #             }
+    #         ):
+    #             return False
 
-                if len(word) == 1:
-                    parent = ''
-                else:
-                    parent = word[:-1]
+    #         for key in t1_node_keys:
+    #             t1_node_key = t1_node[key]
+    #             t2_node_key = t2_node[key]
 
-                    if parent not in tree_words:
-                        tree_words = self.__tree_words(
-                            [parent],
-                            tree_words
-                        )
+    #             if (
+    #                 key != 'childs'
+    #                 and t1_node_key != t2_node_key
+    #             ):
+    #                 return False
+    #             elif key == 'childs':
+    #                 if len(t1_node_key) != len(t2_node_key):
+    #                     return False
+    #                 elif set(t1_node_key) != set(t2_node_key):
+    #                     return False
 
-                tree_words[parent]['childs'] = list(
-                    set(
-                        tree_words[parent]['childs']
-                        + [word]
-                    )
-                )
+    #     return True
 
-                if recursive is False:
-                    tree_words[word]['in_words'] = word in words
+    # def are_words_found_equal_to(self, string, another_words: dict):
+    #     w1 = self.find_in(string)
+    #     w2 = another_words
+    #     w1_keys = w1.keys()
 
-            if recursive is False:
-                for word in tree_words:
-                    len_word = len(word)
+    #     if len(w1) != len(w2):
+    #         return False
+    #     elif w1_keys != w2.keys():
+    #         return False
 
-                    if len_word == 1:
-                        suffix_link = ''
-                    elif len_word > 1:
-                        for w in range(len_word):
-                            first_w = w + 1
+    #     for key in w1_keys:
+    #         get_w1_key = w1[key]
+    #         get_w2_key = w2[key]
+    #         len_w1_key = len(get_w1_key)
 
-                            if first_w == len_word:
-                                suffix_link = ''
-                                break
+    #         if len_w1_key != len(w2[key]):
+    #             return False
 
-                            suffix_link = word[first_w:]
+    #         for k in range(len_w1_key):
+    #             if get_w1_key[k] != get_w2_key[k]:
+    #                 return False
 
-                            if suffix_link in tree_words:
-                                break
-                    else:
-                        suffix_link = None
-
-                    tree_words[word]['suffix_link'] = suffix_link
-
-                    if suffix_link in words:
-                        word_suffix_link = suffix_link
-                    else:
-                        if suffix_link is None or len(suffix_link) <= 1:
-                            word_suffix_link = None
-                        else:
-                            len_suffix = len(suffix_link)
-
-                            for s in range(len_suffix):
-                                first_s = s + 1
-
-                                if first_s == len_suffix:
-                                    word_suffix_link = None
-                                    break
-
-                                word_suffix_link = suffix_link[first_s:]
-
-                                if word_suffix_link in words:
-                                    break
-
-                    tree_words[word]['word_suffix_link'] = word_suffix_link
-
-        return tree_words
-
-    def find_in(self, string):
-        words = {}
-        tree = self.tree_words
-
-        if len(tree) == 1:
-            return words
-
-        node = ''
-        position = 0
-
-        while len(string):
-            if node is not None:
-                for child in tree[node]['childs']:
-                    if string.find(child) == 0:
-                        node = child
-                        break
-                else:
-                    node = tree[node]['suffix_link']
-
-                    if node == '':
-                        position += 1
-                        string = string[1:]
-            else:
-                node = ''
-
-            if node:
-                if string.find(node) == 0:
-                    word_suffix_link = tree[node]['word_suffix_link']
-
-                    if tree[node]['in_words'] is True:
-                        get_node = words.get(node)
-
-                        if get_node:
-                            if position not in get_node:
-                                words[node].append(position)
-                        else:
-                            words[node] = [position]
-
-                        if not tree[node]['childs']:
-                            node = tree[node]['suffix_link']
-                            position += 1
-                            string = string[1:]
-
-                    if word_suffix_link:
-                        get_word_suffix = words.get(word_suffix_link)
-                        w_position = position + 1
-
-                        if get_word_suffix:
-                            if w_position not in get_word_suffix:
-                                words[word_suffix_link].append(w_position)
-                        else:
-                            words[word_suffix_link] = [w_position]
-
-                        position += 1
-                        string = string[1:]
-            elif node is None:
-                position += 1
-                string = string[1:]
-
-        return words
-
-    def is_tree_words_equal_to(self, another_tree_words: dict):
-        t1 = self.tree_words
-        t2 = another_tree_words
-
-        if len(t1) != len(t2):
-            return False
-        elif t1.keys() != t2.keys():
-            return False
-
-        for node in t1.keys():
-            t1_node = t1[node]
-            t1_node_keys = t1_node.keys()
-            t2_node = t2[node]
-
-            if len(t1_node) != len(t2_node):
-                return False
-            elif (
-                t1_node_keys
-                != t2_node.keys()
-                != {
-                    'childs',
-                    'in_words',
-                    'suffix_link',
-                    'word_suffix_link'
-                }
-            ):
-                return False
-
-            for key in t1_node_keys:
-                t1_node_key = t1_node[key]
-                t2_node_key = t2_node[key]
-
-                if (
-                    key != 'childs'
-                    and t1_node_key != t2_node_key
-                ):
-                    return False
-                elif key == 'childs':
-                    if len(t1_node_key) != len(t2_node_key):
-                        return False
-                    elif set(t1_node_key) != set(t2_node_key):
-                        return False
-
-        return True
-
-    def are_words_found_equal_to(self, string, another_words: dict):
-        w1 = self.find_in(string)
-        w2 = another_words
-        w1_keys = w1.keys()
-
-        if len(w1) != len(w2):
-            return False
-        elif w1_keys != w2.keys():
-            return False
-
-        for key in w1_keys:
-            get_w1_key = w1[key]
-            get_w2_key = w2[key]
-            len_w1_key = len(get_w1_key)
-
-            if len_w1_key != len(w2[key]):
-                return False
-
-            for k in range(len_w1_key):
-                if get_w1_key[k] != get_w2_key[k]:
-                    return False
-
-        return True
+    #     return True
 
 
-class Test(TestCase):
-    def test_AhoCorasick_tree_words_1(self):
-        self.assertEqual(
-            AhoCorasick(
-                ['']
-            ).is_tree_words_equal_to(
-                {
-                    '': {
-                        'childs': [],
-                        'in_words': False,
-                        'word_suffix_link': None,
-                        'suffix_link': None
-                    }
-                }
-            ),
-            True
-        )
+# class Test(TestCase):
+#     def test_AhoCorasick_tree_words_1(self):
+#         self.assertEqual(
+#             AhoCorasick(
+#                 ['']
+#             ).is_tree_words_equal_to(
+#                 {
+#                     '': {
+#                         'childs': [],
+#                         'in_words': False,
+#                         'word_suffix_link': None,
+#                         'suffix_link': None
+#                     }
+#                 }
+#             ),
+#             True
+#         )
 
-    def test_AhoCorasick_tree_words_2(self):
-        self.assertEqual(
-            AhoCorasick(
-                'a ab'
-            ).is_tree_words_equal_to(
-                {
-                    '': {
-                        'childs': ['a'],
-                        'in_words': False,
-                        'word_suffix_link': None,
-                        'suffix_link': None
-                    },
-                    'a': {
-                        'childs': ['ab'],
-                        'in_words': True,
-                        'word_suffix_link': None,
-                        'suffix_link': ''
-                    },
-                    'ab': {
-                        'childs': [],
-                        'in_words': True,
-                        'word_suffix_link': None,
-                        'suffix_link': ''
-                    }
-                }
-            ),
-            True
-        )
+    # def test_AhoCorasick_tree_words_2(self):
+    #     self.assertEqual(
+    #         AhoCorasick(
+    #             'a ab'
+    #         ).is_tree_words_equal_to(
+    #             {
+    #                 '': {
+    #                     'childs': ['a'],
+    #                     'in_words': False,
+    #                     'word_suffix_link': None,
+    #                     'suffix_link': None
+    #                 },
+    #                 'a': {
+    #                     'childs': ['ab'],
+    #                     'in_words': True,
+    #                     'word_suffix_link': None,
+    #                     'suffix_link': ''
+    #                 },
+    #                 'ab': {
+    #                     'childs': [],
+    #                     'in_words': True,
+    #                     'word_suffix_link': None,
+    #                     'suffix_link': ''
+    #                 }
+    #             }
+    #         ),
+    #         True
+    #     )
 
-    def test_AhoCorasick_tree_words_3(self):
-        self.assertEqual(
-            AhoCorasick(
-                [
-                    'a', 'ab', 'bab', 'bc', 'bca', 'c', 'caa'
-                ]
-            ).is_tree_words_equal_to(
-                {
-                    '': {
-                        'childs': ['a', 'b', 'c'],
-                        'in_words': False,
-                        'suffix_link': None,
-                        'word_suffix_link': None
-                    },
-                    'a': {
-                        'childs': ['ab'],
-                        'in_words': True,
-                        'suffix_link': '',
-                        'word_suffix_link': None
-                    },
-                    'b': {
-                        'childs': ['ba', 'bc'],
-                        'in_words': False,
-                        'suffix_link': '',
-                        'word_suffix_link': None
-                    },
-                    'c': {
-                        'childs': ['ca'],
-                        'in_words': True,
-                        'suffix_link': '',
-                        'word_suffix_link': None
-                    },
-                    'ab': {
-                        'childs': [],
-                        'in_words': True,
-                        'suffix_link': 'b',
-                        'word_suffix_link': None
-                    },
-                    'ba': {
-                        'childs': ['bab'],
-                        'in_words': False,
-                        'suffix_link': 'a',
-                        'word_suffix_link': 'a'
-                    },
-                    'bc': {
-                        'childs': ['bca'],
-                        'in_words': True,
-                        'suffix_link': 'c',
-                        'word_suffix_link': 'c'
-                    },
-                    'ca': {
-                        'childs': ['caa'],
-                        'in_words': False,
-                        'suffix_link': 'a',
-                        'word_suffix_link': 'a'
-                    },
-                    'bab': {
-                        'childs': [],
-                        'in_words': True,
-                        'suffix_link': 'ab',
-                        'word_suffix_link': 'ab'
-                    },
-                    'bca': {
-                        'childs': [],
-                        'in_words': True,
-                        'suffix_link': 'ca',
-                        'word_suffix_link': 'a'
-                    },
-                    'caa': {
-                        'childs': [],
-                        'in_words': True,
-                        'suffix_link': 'a',
-                        'word_suffix_link': 'a'
-                    }
-                }
-            ),
-            True
-        )
+    # def test_AhoCorasick_tree_words_3(self):
+    #     self.assertEqual(
+    #         AhoCorasick(
+    #             [
+    #                 'a', 'ab', 'bab', 'bc', 'bca', 'c', 'caa'
+    #             ]
+    #         ).is_tree_words_equal_to(
+    #             {
+    #                 '': {
+    #                     'childs': ['a', 'b', 'c'],
+    #                     'in_words': False,
+    #                     'suffix_link': None,
+    #                     'word_suffix_link': None
+    #                 },
+    #                 'a': {
+    #                     'childs': ['ab'],
+    #                     'in_words': True,
+    #                     'suffix_link': '',
+    #                     'word_suffix_link': None
+    #                 },
+    #                 'b': {
+    #                     'childs': ['ba', 'bc'],
+    #                     'in_words': False,
+    #                     'suffix_link': '',
+    #                     'word_suffix_link': None
+    #                 },
+    #                 'c': {
+    #                     'childs': ['ca'],
+    #                     'in_words': True,
+    #                     'suffix_link': '',
+    #                     'word_suffix_link': None
+    #                 },
+    #                 'ab': {
+    #                     'childs': [],
+    #                     'in_words': True,
+    #                     'suffix_link': 'b',
+    #                     'word_suffix_link': None
+    #                 },
+    #                 'ba': {
+    #                     'childs': ['bab'],
+    #                     'in_words': False,
+    #                     'suffix_link': 'a',
+    #                     'word_suffix_link': 'a'
+    #                 },
+    #                 'bc': {
+    #                     'childs': ['bca'],
+    #                     'in_words': True,
+    #                     'suffix_link': 'c',
+    #                     'word_suffix_link': 'c'
+    #                 },
+    #                 'ca': {
+    #                     'childs': ['caa'],
+    #                     'in_words': False,
+    #                     'suffix_link': 'a',
+    #                     'word_suffix_link': 'a'
+    #                 },
+    #                 'bab': {
+    #                     'childs': [],
+    #                     'in_words': True,
+    #                     'suffix_link': 'ab',
+    #                     'word_suffix_link': 'ab'
+    #                 },
+    #                 'bca': {
+    #                     'childs': [],
+    #                     'in_words': True,
+    #                     'suffix_link': 'ca',
+    #                     'word_suffix_link': 'a'
+    #                 },
+    #                 'caa': {
+    #                     'childs': [],
+    #                     'in_words': True,
+    #                     'suffix_link': 'a',
+    #                     'word_suffix_link': 'a'
+    #                 }
+    #             }
+    #         ),
+    #         True
+    #     )
 
-    def test_AhoCorasick_words_found_1(self):
-        self.assertEqual(
-            AhoCorasick(
-                [
-                    'a', 'ab', 'bab', 'bc', 'bca', 'c', 'caa'
-                ]
-            ).are_words_found_equal_to(
-                'abccab',
-                {
-                    'a': [0, 4],
-                    'ab': [0, 4],
-                    'bc': [1],
-                    'c': [2, 3]
-                }
-            ),
-            True
-        )
+    # def test_AhoCorasick_words_found_1(self):
+    #     self.assertEqual(
+    #         AhoCorasick(
+    #             [
+    #                 'a', 'ab', 'bab', 'bc', 'bca', 'c', 'caa'
+    #             ]
+    #         ).are_words_found_equal_to(
+    #             'abccab',
+    #             {
+    #                 'a': [0, 4],
+    #                 'ab': [0, 4],
+    #                 'bc': [1],
+    #                 'c': [2, 3]
+    #             }
+    #         ),
+    #         True
+    #     )
 
-    def test_AhoCorasick_words_found_2(self):
-        self.assertEqual(
-            AhoCorasick(
-                [
-                    'b', 'c', 'aa', 'd', 'b'
-                ]
-            ).are_words_found_equal_to(
-                'caaab',
-                {
-                    'aa': [1, 2],
-                    'b': [4],
-                    'c': [0]
-                }
-            ),
-            True
-        )
+    # def test_AhoCorasick_words_found_2(self):
+    #     self.assertEqual(
+    #         AhoCorasick(
+    #             [
+    #                 'b', 'c', 'aa', 'd', 'b'
+    #             ]
+    #         ).are_words_found_equal_to(
+    #             'caaab',
+    #             {
+    #                 'aa': [1, 2],
+    #                 'b': [4],
+    #                 'c': [0]
+    #             }
+    #         ),
+    #         True
+    #     )
 
 
 if __name__ == '__main__':
-    main()
+    # main()
+    pass
