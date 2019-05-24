@@ -1,23 +1,22 @@
 #!/usr/bin/env python3
 
 # from unittest import main, TestCase
-from collections import defaultdict
 
 
 class Node:
     def __init__(
         self,
-        path='',
+        childs: set,
+        key='',
         in_keys=False,
         suffix=None,
-        key_suffix=None,
-        childs=set()
+        key_suffix=None
     ):
-        self.path = path
+        self.childs = childs
+        self.key = key
         self.in_keys = in_keys
         self.suffix: Node = suffix
         self.key_suffix: Node = key_suffix
-        self.childs = childs
 
 
 class AhoCorasick:
@@ -33,45 +32,127 @@ class AhoCorasick:
 
     def __init__(self, keys: list):
         self.tree = self.build_tree(keys)
+        self.a = 1
 
     def build_tree(self, keys: list) -> Node:
-        root = defaultdict(Node)
-        root['']
+        root = {}
+        root[''] = Node(
+            set()
+        )
 
         for key in keys:
-            node = root[key]
-            node.path = key
-            node.in_keys = True
-            node.childs.add(
-                root[
-                    key[:-1]
-                ]
-            )
-
-        root_keys = root.keys()
-
-        for path in root_keys:
-            if path == '':
+            if '' in keys:
                 continue
 
-            node = root[path]
+            if key not in root:
+                root[key] = Node(
+                    set(),
+                    key,
+                    True
+                )
 
-            for p in path:
-                path = path[1:]
+            # Add key as a child into it parent key
+            parent_key = key[:-1]
 
-                if path in root_keys:
-                    node.suffix = root[path]
+            if parent_key not in root:
+                root[parent_key] = Node(
+                    set(),
+                    parent_key,
+                    parent_key in keys
+                )
 
-                    for key in path:
-                        if path in keys:
-                            node.key_suffix = root[path]
+            root[parent_key].childs.add(
+                root[key]
+            )
+
+            # Add entire key's childs
+            for i, k in enumerate(key):
+                parent_key = key[:-1]
+                key = key[1:]
+
+                if key not in root:
+                    root[key] = Node(
+                        set(),
+                        key,
+                        key in keys
+                    )
+
+                if key != '':
+                    root[parent_key].childs.add(
+                        root[key]
+                    )
+
+        # Add suffix for entire key in root
+        for key in root:
+            if key == '':
+                continue
+
+            for k in key:
+                node = root[key]
+                key = key[1:]
+
+                if key in root:
+                    node.suffix = root[key]
+
+                    for suffix in key:
+                        if key == '':
                             break
 
-                        path = path[1:]
+                        if key in keys:
+                            node.key_suffix = root[key]
+                            break
+
+                        key = key[1:]
 
                     break
 
         return root['']
+
+    # def build_tree(self, keys: list) -> Node:
+    #     root = {}
+    #     root[''] = Node()
+
+    #     for key in keys:
+    #         root[key] = Node(key, True)
+    #         root[
+    #             key[:-1]
+    #         ].childs.add(key)
+
+    #         for i, k in enumerate(key):
+    #             current_i = i+1
+    #             suffix = key[current_i:]
+
+    #             if suffix not in root.keys():
+    #                 root[suffix] = Node(suffix)
+
+    #             if suffix != '':
+    #                 root[
+    #                     key[:current_i]
+    #                 ].childs.add(suffix)
+
+    #     root_keys = root.keys()
+
+    #     for key in root_keys:
+    #         if key == '':
+    #             continue
+
+    #         for k in key:
+    #             node = root[key]
+    #             key = key[1:]
+
+    #             if suffix in root_keys:
+    #                 node.suffix = root[suffix]
+
+    #                 for s in suffix:
+    #                     if suffix in keys:
+    #                         node.key_suffix = root[suffix]
+    #                         break
+
+    #                     suffix = suffix[1:]
+
+    #                 break
+
+    #     return root['']
 
     def find_in(self, text: str):
         pass
