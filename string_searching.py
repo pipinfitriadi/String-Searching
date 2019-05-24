@@ -1,15 +1,23 @@
 #!/usr/bin/env python3
 
 # from unittest import main, TestCase
+from collections import defaultdict
 
 
 class Node:
-    def __init__(self, key: str = '', in_keys: bool = False):
-        self.path = key
+    def __init__(
+        self,
+        path='',
+        in_keys=False,
+        suffix=None,
+        key_suffix=None,
+        childs=set()
+    ):
+        self.path = path
         self.in_keys = in_keys
-        self.suffix_link: Node = None
-        self.key_suffix_link: Node = None
-        self.childs = []
+        self.suffix: Node = suffix
+        self.key_suffix: Node = key_suffix
+        self.childs = childs
 
 
 class AhoCorasick:
@@ -24,11 +32,46 @@ class AhoCorasick:
     """
 
     def __init__(self, keys: list):
-        self.tree_node = self.__tree_node(keys)
+        self.tree = self.build_tree(keys)
 
-    def __tree_node(self, keys: list) -> Node:
-        root = Node()
-        return root
+    def build_tree(self, keys: list) -> Node:
+        root = defaultdict(Node)
+        root['']
+
+        for key in keys:
+            node = root[key]
+            node.path = key
+            node.in_keys = True
+            node.childs.add(
+            	   root[
+            	       key[:-1]
+            	   ]
+            )
+        
+        root_keys = root.keys()
+        
+        for path in root_keys:
+            if path == '':
+                continue
+            
+            node = root[path]
+            
+            for p in path:
+                path = path[1:]
+                
+                if path in root_keys:
+                    node.suffix = root[path]
+                    
+                    for key in path:
+                        if path in keys:
+                            node.key_suffix = root[path]
+                            break
+                        
+                        path = path[1:]
+                    
+                    break
+
+        return root['']
 
     def find_in(self, text: str):
         pass
@@ -267,4 +310,9 @@ class AhoCorasick:
 
 if __name__ == '__main__':
     # main()
-    pass
+    
+    print(
+        AhoCorasick(
+            ['a', 'ab', 'bab', 'bc', 'bca', 'c', 'caa']
+        ).tree
+    )

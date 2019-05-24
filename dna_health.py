@@ -45,10 +45,10 @@ if __name__ == '__main__':
         )
         d = first_last_d[2]
     #     total_health = 0
-        dna_gene = defaultdict(list)
+        dna_gene = defaultdict(int)
 
         for gene, health in genes[first:last + 1]:
-            dna_gene[gene].append(health)
+            dna_gene[gene] += health
 
         dna_gene = sorted(dna_gene.items())
 
