@@ -26,7 +26,7 @@ class AhoCorasick:
     Alfred V. Aho and Margaret J. Corasick.
 
     Implemented by Pipin Fitriadi (pipinfitriadi@gmail.com) at May 19th, 2019
-    and updated at May 23th, 2019.
+    and updated at May 24th, 2019.
 
     Source: https://en.wikipedia.org/wiki/Aho%E2%80%93Corasick_algorithm
     """
@@ -43,32 +43,32 @@ class AhoCorasick:
             node.path = key
             node.in_keys = True
             node.childs.add(
-            	   root[
-            	       key[:-1]
-            	   ]
+                root[
+                    key[:-1]
+                ]
             )
-        
+
         root_keys = root.keys()
-        
+
         for path in root_keys:
             if path == '':
                 continue
-            
+
             node = root[path]
-            
+
             for p in path:
                 path = path[1:]
-                
+
                 if path in root_keys:
                     node.suffix = root[path]
-                    
+
                     for key in path:
                         if path in keys:
                             node.key_suffix = root[path]
                             break
-                        
+
                         path = path[1:]
-                    
+
                     break
 
         return root['']
@@ -310,7 +310,7 @@ class AhoCorasick:
 
 if __name__ == '__main__':
     # main()
-    
+
     print(
         AhoCorasick(
             ['a', 'ab', 'bab', 'bc', 'bca', 'c', 'caa']
