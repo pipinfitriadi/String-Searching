@@ -23,10 +23,95 @@ class Node:
         # for data type set, dict, list, and tuple.
         self.childs = set()
 
+    # Recommended way to implement __eq__ and __hash__
+    # Source:
+    # https://stackoverflow.com/questions/45164691/recommended-way-to-implement-eq-and-hash
+    def __members(self):
+        return (
+            self.key,
+            self.in_keys,
+            self.suffix,
+            self.key_suffix,
+
+            # Type error Unhashable type:set
+            # Source:
+            # https://stackoverflow.com/questions/23577724/type-error-unhashable-typeset
+            frozenset(
+                # I used set() instead self.childs for frozenset,
+                # because self.childs lenght would be incorect
+                # if it is converted into frozenset.
+                set()
+            )
+        )
+
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, Node):
+            return False
+        elif self.key != other.key:
+            return False
+        elif self.in_keys != other.in_keys:
+            return False
+        elif (
+            (
+                self.suffix is None
+                and other.suffix is not None
+            ) or (
+                self.suffix is not None
+                and other.suffix is None
+            )
+        ):
+            return False
+        elif (
+            self.suffix is not None
+            and other.suffix is not None
+            and self.suffix.key != other.suffix.key
+        ):
+            return False
+        elif (
+            (
+                self.key_suffix is None
+                and other.key_suffix is not None
+            ) or (
+                self.key_suffix is not None
+                and other.key_suffix is None
+            )
+        ):
+            return False
+        elif (
+            self.key_suffix is not None
+            and other.key_suffix is not None
+            and self.key_suffix.key != other.key_suffix.key
+        ):
+            return False
+        elif len(self.childs) != len(other.childs):
+            return False
+        elif (
+            len(self.childs) > 0
+            and (
+                {node.key for node in self.childs}
+                != {node.key for node in other.childs}
+            )
+        ):
+            return False
+
+        for n in self.childs:
+            for o in other.childs:
+                if n.key != o.key:
+                    continue
+                elif not (n == o):
+                    return False
+
+        return True
+
+    def __hash__(self):
+        return hash(
+            self.__members()
+        )
+
 
 class AhoCorasick:
     """
-    Class AhoCorasick Version 2.3.2
+    Class AhoCorasick Version 2.4.0
 
     the Aho–Corasick algorithm is a string-searching algorithm invented by
     Alfred V. Aho and Margaret J. Corasick.
@@ -88,66 +173,6 @@ class AhoCorasick:
     def find_in(self, text: str):
         pass
 
-    def compare_node(node_1: Node, node_2: Node) -> bool:
-        if node_1.key != node_2.key:
-            return False
-        elif node_1.in_keys != node_2.in_keys:
-            return False
-        elif (
-            (
-                node_1.suffix is None
-                and node_2.suffix is not None
-            ) or (
-                node_1.suffix is not None
-                and node_2.suffix is None
-            )
-        ):
-            return False
-        elif (
-            node_1.suffix is not None
-            and node_2.suffix is not None
-            and node_1.suffix.key != node_2.suffix.key
-        ):
-            return False
-        elif (
-            (
-                node_1.key_suffix is None
-                and node_2.key_suffix is not None
-            ) or (
-                node_1.key_suffix is not None
-                and node_2.key_suffix is None
-            )
-        ):
-            return False
-        elif (
-            node_1.key_suffix is not None
-            and node_2.key_suffix is not None
-            and node_1.key_suffix.key != node_2.key_suffix.key
-        ):
-            return False
-        elif len(node_1.childs) != len(node_2.childs):
-            return False
-        elif (
-            len(node_1.childs) > 0
-            and (
-                {node.key for node in node_1.childs}
-                != {node.key for node in node_2.childs}
-            )
-        ):
-            return False
-
-        for n_1 in node_1.childs:
-            for n_2 in node_2.childs:
-                if n_1.key != n_2.key:
-                    continue
-                elif not AhoCorasick.compare_node(n_1, n_2):
-                    return False
-
-        return True
-
-    def is_tree_equal_to(self, another_tree: Node) -> bool:
-        return AhoCorasick.compare_node(self.tree, another_tree)
-
     # def are_words_found_equal_to(self, string, another_words: dict):
     #     w1 = self.find_in(string)
     #     w2 = another_words
@@ -178,9 +203,7 @@ class Test(TestCase):
         self.assertEqual(
             AhoCorasick(
                 ['']
-            ).is_tree_equal_to(
-                Node()
-            ),
+            ).tree == Node(),
             True
         )
 
@@ -195,7 +218,7 @@ class Test(TestCase):
         self.assertEqual(
             AhoCorasick(
                 ['a', 'ab']
-            ).is_tree_equal_to(tree),
+            ).tree == tree,
             True
         )
 
@@ -223,7 +246,7 @@ class Test(TestCase):
         self.assertEqual(
             AhoCorasick(
                 ['a', 'ab', 'bab', 'bc', 'bca', 'c', 'caa']
-            ).is_tree_equal_to(tree),
+            ).tree == tree,
             True
         )
 
@@ -241,7 +264,7 @@ class Test(TestCase):
         self.assertEqual(
             AhoCorasick(
                 ['b', 'c', 'aa', 'd', 'b']
-            ).is_tree_equal_to(tree),
+            ).tree == tree,
             True
         )
 
@@ -259,7 +282,7 @@ class Test(TestCase):
         self.assertEqual(
             AhoCorasick(
                 ['a', 'b', 'c', 'aa', 'd']
-            ).is_tree_equal_to(tree),
+            ).tree == tree,
             True
         )
 
@@ -276,7 +299,7 @@ class Test(TestCase):
         self.assertEqual(
             AhoCorasick(
                 ['c', 'aa', 'd']
-            ).is_tree_equal_to(tree),
+            ).tree == tree,
             True
         )
 
