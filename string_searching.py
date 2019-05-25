@@ -26,7 +26,7 @@ class Node:
 
 class AhoCorasick:
     """
-    Class AhoCorasick Version 2.3.1
+    Class AhoCorasick Version 2.3.2
 
     the Aho–Corasick algorithm is a string-searching algorithm invented by
     Alfred V. Aho and Margaret J. Corasick.
@@ -145,7 +145,7 @@ class AhoCorasick:
 
         return True
 
-    def is_tree_equal_to(self, another_tree: Node):
+    def is_tree_equal_to(self, another_tree: Node) -> bool:
         return AhoCorasick.compare_node(self.tree, another_tree)
 
     # def are_words_found_equal_to(self, string, another_words: dict):
