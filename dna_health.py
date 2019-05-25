@@ -5,7 +5,7 @@ Hackerrank: Determining DNA Health
 URL: https://www.hackerrank.com/challenges/determining-dna-health/problem
 
 Try to be solved by Pipin Fitriadi (pipinfitriadi@gmail.com) at May 21th 2019,
-updated at May 23th 2019.
+updated at May 25th 2019.
 """
 
 from collections import defaultdict
@@ -50,7 +50,7 @@ if __name__ == '__main__':
         for gene, health in genes[first:last + 1]:
             dna_gene[gene] += health
 
-        dna_gene = sorted(dna_gene.items())
+        dna_gene = dna_gene.items()
 
     #     for g in set(dna_gene):
     #         gene_health = 0
