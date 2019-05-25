@@ -26,7 +26,7 @@ class Node:
 
 class AhoCorasick:
     """
-    Class AhoCorasick Version 2.3.0.
+    Class AhoCorasick Version 2.3.1
 
     the Aho–Corasick algorithm is a string-searching algorithm invented by
     Alfred V. Aho and Margaret J. Corasick.
@@ -147,51 +147,6 @@ class AhoCorasick:
 
     def is_tree_equal_to(self, another_tree: Node):
         return AhoCorasick.compare_node(self.tree, another_tree)
-
-    # def is_tree_words_equal_to(self, another_tree_words: dict):
-    #     t1 = self.tree_words
-    #     t2 = another_tree_words
-
-    #     if len(t1) != len(t2):
-    #         return False
-    #     elif t1.keys() != t2.keys():
-    #         return False
-
-    #     for node in t1.keys():
-    #         t1_node = t1[node]
-    #         t1_node_keys = t1_node.keys()
-    #         t2_node = t2[node]
-
-    #         if len(t1_node) != len(t2_node):
-    #             return False
-    #         elif (
-    #             t1_node_keys
-    #             != t2_node.keys()
-    #             != {
-    #                 'childs',
-    #                 'in_words',
-    #                 'suffix_link',
-    #                 'word_suffix_link'
-    #             }
-    #         ):
-    #             return False
-
-    #         for key in t1_node_keys:
-    #             t1_node_key = t1_node[key]
-    #             t2_node_key = t2_node[key]
-
-    #             if (
-    #                 key != 'childs'
-    #                 and t1_node_key != t2_node_key
-    #             ):
-    #                 return False
-    #             elif key == 'childs':
-    #                 if len(t1_node_key) != len(t2_node_key):
-    #                     return False
-    #                 elif set(t1_node_key) != set(t2_node_key):
-    #                     return False
-
-    #     return True
 
     # def are_words_found_equal_to(self, string, another_words: dict):
     #     w1 = self.find_in(string)
