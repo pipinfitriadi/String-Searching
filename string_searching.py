@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+from collections import defaultdict
 from unittest import main, TestCase
 
 
@@ -111,13 +112,13 @@ class Node:
 
 class AhoCorasick:
     """
-    Class AhoCorasick Version 2.4.0
+    Class AhoCorasick Version 2.4.3
 
     the Aho–Corasick algorithm is a string-searching algorithm invented by
     Alfred V. Aho and Margaret J. Corasick.
 
     Implemented by Pipin Fitriadi (pipinfitriadi@gmail.com) at May 19th, 2019
-    and updated at May 25th, 2019.
+    and updated at May 26th, 2019.
 
     Source: https://en.wikipedia.org/wiki/Aho%E2%80%93Corasick_algorithm
     """
@@ -176,8 +177,48 @@ class AhoCorasick:
 
         return root['']
 
-    def find_in(self, text: str):
-        pass
+    def find_in(self, text: str) -> dict:
+        result = defaultdict(list)
+        t = 0
+
+        while t < len(text):
+            node = self.tree
+
+            while node is not None:
+                remaining_text = text[t:]
+                key = node.key
+
+                if key != '':
+                    len_key = len(key)
+
+                    if key == remaining_text[:len_key]:
+                        if node.in_keys:
+                            result[key].append(
+                                t + len_key - 1
+                            )
+
+                        key_suffix = node.key_suffix
+
+                        if key_suffix:
+                            while key_suffix:
+                                t += 1
+                                key = key_suffix.key
+                                result[key].append(
+                                    t + len(key) - 1
+                                )
+                                key_suffix = key_suffix.key_suffix
+
+                for child in node.childs:
+                    key = child.key
+
+                    if key == remaining_text[:len(key)]:
+                        node = child
+                        break
+                else:
+                    node = node.suffix
+                    t += 1
+
+        return result
 
     # def are_words_found_equal_to(self, string, another_words: dict):
     #     w1 = self.find_in(string)
@@ -346,10 +387,10 @@ class Test(TestCase):
 
 
 if __name__ == '__main__':
-    main()
+    # main()
 
-    # print(
-    #     AhoCorasick(
-    #         ['a', 'ab', 'bab', 'bc', 'bca', 'c', 'caa']
-    #     ).tree
-    # )
+    print(
+        AhoCorasick(
+            ['a', 'ab', 'bab', 'bc', 'bca', 'c', 'caa']
+        ).find_in('abccab')
+    )
