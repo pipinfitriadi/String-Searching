@@ -1,5 +1,29 @@
 #!/usr/bin/env python3
 
+"""
+MIT License
+
+Copyright (c) 2019 Pipin Fitriadi
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+"""
+
 from collections import defaultdict
 from unittest import main, TestCase
 
@@ -112,7 +136,7 @@ class Node:
 
 class AhoCorasick:
     """
-    Class AhoCorasick Version 2.4.3
+    Class AhoCorasick Version 2.5.0
 
     the Aho–Corasick algorithm is a string-searching algorithm invented by
     Alfred V. Aho and Margaret J. Corasick.
@@ -178,71 +202,75 @@ class AhoCorasick:
         return root['']
 
     def find_in(self, text: str) -> dict:
-        result = defaultdict(list)
+        found = defaultdict(list)
         t = 0
+        node = self.tree
 
         while t < len(text):
-            node = self.tree
+            if node is None:
+                node = self.tree
 
-            while node is not None:
-                remaining_text = text[t:]
-                key = node.key
+            key = node.key
+            len_key = len(key)
 
-                if key != '':
-                    len_key = len(key)
-
-                    if key == remaining_text[:len_key]:
-                        if node.in_keys:
-                            result[key].append(
-                                t + len_key - 1
-                            )
-
-                        key_suffix = node.key_suffix
-
-                        if key_suffix:
-                            while key_suffix:
-                                t += 1
-                                key = key_suffix.key
-                                result[key].append(
-                                    t + len(key) - 1
-                                )
-                                key_suffix = key_suffix.key_suffix
-
+            if key == '':
                 for child in node.childs:
                     key = child.key
 
-                    if key == remaining_text[:len(key)]:
+                    if key == text[t:t + len(key)]:
                         node = child
                         break
                 else:
                     node = node.suffix
                     t += 1
+            elif key == text[t:t + len_key]:
+                outpout = t + len_key - 1
 
-        return result
+                if node.in_keys:
+                    found[key].append(outpout)
 
-    # def are_words_found_equal_to(self, string, another_words: dict):
-    #     w1 = self.find_in(string)
-    #     w2 = another_words
-    #     w1_keys = w1.keys()
+                for child in node.childs:
+                    key = child.key
 
-    #     if len(w1) != len(w2):
-    #         return False
-    #     elif w1_keys != w2.keys():
-    #         return False
+                    if key == text[t:t + len(key)]:
+                        node = child
+                        break
+                else:
+                    node = node.suffix
+                    t += 1
+            else:
+                node = node.suffix
+                t += 1
 
-    #     for key in w1_keys:
-    #         get_w1_key = w1[key]
-    #         get_w2_key = w2[key]
-    #         len_w1_key = len(get_w1_key)
+        return found
 
-    #         if len_w1_key != len(w2[key]):
-    #             return False
+    def are_keys_found_equal_to(
+        self,
+        text: str,
+        other_keys_found: dict
+    ) -> bool:
+        k1 = self.find_in(text)
+        k2 = other_keys_found
+        k1_keys = k1.keys()
 
-    #         for k in range(len_w1_key):
-    #             if get_w1_key[k] != get_w2_key[k]:
-    #                 return False
+        if len(k1) != len(k2):
+            return False
+        elif k1_keys != k2.keys():
+            return False
 
-    #     return True
+        for key in k1_keys:
+            get_k1_key = k1[key]
+            get_k2_key = k2[key]
+            len_k1_key = len(get_k1_key)
+
+            if len_k1_key != len(k2[key]):
+                return False
+
+            for k in range(len_k1_key):
+                if get_k1_key[k] != get_k2_key[k]:
+                    return False
+
+        return True
 
 
 class Test(TestCase):
@@ -350,47 +378,91 @@ class Test(TestCase):
             True
         )
 
-    # def test_AhoCorasick_words_found_1(self):
-    #     self.assertEqual(
-    #         AhoCorasick(
-    #             [
-    #                 'a', 'ab', 'bab', 'bc', 'bca', 'c', 'caa'
-    #             ]
-    #         ).are_words_found_equal_to(
-    #             'abccab',
-    #             {
-    #                 'a': [0, 4],
-    #                 'ab': [0, 4],
-    #                 'bc': [1],
-    #                 'c': [2, 3]
-    #             }
-    #         ),
-    #         True
-    #     )
+    def test_AhoCorasick_keys_found_1(self):
+        self.assertEqual(
+            AhoCorasick(
+                [
+                    'a', 'ab', 'bab', 'bc', 'bca', 'c', 'caa'
+                ]
+            ).are_keys_found_equal_to(
+                'abccab',
+                {
+                    'a': [0, 4],
+                    'ab': [1, 5],
+                    'bc': [2],
+                    'c': [2, 3]
+                }
+            ),
+            True
+        )
 
-    # def test_AhoCorasick_words_found_2(self):
-    #     self.assertEqual(
-    #         AhoCorasick(
-    #             [
-    #                 'b', 'c', 'aa', 'd', 'b'
-    #             ]
-    #         ).are_words_found_equal_to(
-    #             'caaab',
-    #             {
-    #                 'aa': [1, 2],
-    #                 'b': [4],
-    #                 'c': [0]
-    #             }
-    #         ),
-    #         True
-    #     )
+    def test_AhoCorasick_keys_found_2(self):
+        # Perlu dipastikan apakah ini sudah benar?!
+        self.assertEqual(
+            AhoCorasick(
+                [
+                    'a', 'ab', 'bab', 'bc', 'bca', 'c', 'caa'
+                ]
+            ).are_keys_found_equal_to(
+                'abcacaab',
+                {
+                    'a': [0, 3, 5, 6],
+                    'ab': [1, 7],
+                    'bc': [2],
+                    'bca': [3],
+                    'c': [4],
+                    'caa': [6]
+                }
+            ),
+            True
+        )
+
+    def test_AhoCorasick_keys_found_3(self):
+        self.assertEqual(
+            AhoCorasick(
+                [
+                    'b', 'c', 'aa', 'd', 'b'
+                ]
+            ).are_keys_found_equal_to(
+                'caaab',
+                {
+                    'aa': [2, 3],
+                    'b': [4],
+                    'c': [0]
+                }
+            ),
+            True
+        )
+
+    def test_AhoCorasick_keys_found_4(self):
+        self.assertEqual(
+            AhoCorasick(
+                [
+                    'a', 'b', 'c', 'aa', 'd'
+                ]
+            ).are_keys_found_equal_to(
+                'xyz',
+                {}
+            ),
+            True
+        )
+
+    def test_AhoCorasick_keys_found_5(self):
+        self.assertEqual(
+            AhoCorasick(
+                [
+                    'c', 'aa', 'd'
+                ]
+            ).are_keys_found_equal_to(
+                'bcdybc',
+                {
+                    'd': [2],
+                    'c': [1, 5]
+                }
+            ),
+            True
+        )
 
 
 if __name__ == '__main__':
-    # main()
-
-    print(
-        AhoCorasick(
-            ['a', 'ab', 'bab', 'bc', 'bca', 'c', 'caa']
-        ).find_in('abccab')
-    )
+    main()
