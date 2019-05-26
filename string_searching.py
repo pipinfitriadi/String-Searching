@@ -131,7 +131,9 @@ class AhoCorasick:
         root[''] = Node()
 
         for key in keys:
-            for k, _ in enumerate(key):
+            for k in range(
+                len(key)
+            ):
                 current_key = key[:k+1]
 
                 if current_key not in root:
@@ -153,13 +155,17 @@ class AhoCorasick:
                 )
 
         for key in root:
-            for k, _ in enumerate(key):
+            for k in range(
+                len(key)
+            ):
                 suffix = key[k+1:]
 
                 if suffix in root:
                     root[key].suffix = root[suffix]
 
-                    for s, _ in enumerate(suffix):
+                    for s in range(
+                        len(suffix)
+                    ):
                         key_suffix = suffix[s:]
 
                         if key_suffix in keys:
