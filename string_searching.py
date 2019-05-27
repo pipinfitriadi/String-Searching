@@ -136,13 +136,13 @@ class Node:
 
 class AhoCorasick:
     """
-    Class AhoCorasick Version 2.5.1
+    Class AhoCorasick Version 2.5.2
 
     the Aho–Corasick algorithm is a string-searching algorithm invented by
     Alfred V. Aho and Margaret J. Corasick.
 
     Implemented by Pipin Fitriadi (pipinfitriadi@gmail.com) at May 19th, 2019
-    and updated at May 27th, 2019.
+    and updated at May 28th, 2019.
 
     Source: https://en.wikipedia.org/wiki/Aho%E2%80%93Corasick_algorithm
     """
@@ -410,15 +410,13 @@ class Test(TestCase):
     def test_AhoCorasick_keys_found_1(self):
         self.assertEqual(
             AhoCorasick(
-                [
-                    'a', 'ab', 'bab', 'bc', 'bca', 'c', 'caa'
-                ]
+                ['a', 'ab', 'bab', 'bc', 'bca', 'c', 'caa']
             ).are_keys_found_equal_to(
                 'abccab',
                 {
                     'a': [0, 4],
-                    'ab': [1, 5],
-                    'bc': [2],
+                    'ab': [0, 4],
+                    'bc': [1],
                     'c': [2, 3]
                 }
             ),
@@ -428,18 +426,16 @@ class Test(TestCase):
     def test_AhoCorasick_keys_found_2(self):
         self.assertEqual(
             AhoCorasick(
-                [
-                    'a', 'ab', 'bab', 'bc', 'bca', 'c', 'caa'
-                ]
+                ['a', 'ab', 'bab', 'bc', 'bca', 'c', 'caa']
             ).are_keys_found_equal_to(
                 'abcacaab',
                 {
                     'a': [0, 3, 5, 6],
-                    'ab': [1, 7],
-                    'bc': [2],
-                    'bca': [3],
+                    'ab': [0, 6],
+                    'bc': [1],
+                    'bca': [1],
                     'c': [2, 4],
-                    'caa': [6]
+                    'caa': [4]
                 }
             ),
             True
@@ -448,13 +444,11 @@ class Test(TestCase):
     def test_AhoCorasick_keys_found_3(self):
         self.assertEqual(
             AhoCorasick(
-                [
-                    'b', 'c', 'aa', 'd', 'b'
-                ]
+                ['b', 'c', 'aa', 'd', 'b']
             ).are_keys_found_equal_to(
                 'caaab',
                 {
-                    'aa': [2, 3],
+                    'aa': [1, 2],
                     'b': [4],
                     'c': [0]
                 }
@@ -465,9 +459,7 @@ class Test(TestCase):
     def test_AhoCorasick_keys_found_4(self):
         self.assertEqual(
             AhoCorasick(
-                [
-                    'a', 'b', 'c', 'aa', 'd'
-                ]
+                ['a', 'b', 'c', 'aa', 'd']
             ).are_keys_found_equal_to(
                 'xyz',
                 {}
@@ -478,14 +470,31 @@ class Test(TestCase):
     def test_AhoCorasick_keys_found_5(self):
         self.assertEqual(
             AhoCorasick(
-                [
-                    'c', 'aa', 'd'
-                ]
+                ['c', 'aa', 'd']
             ).are_keys_found_equal_to(
                 'bcdybc',
                 {
                     'd': [2],
                     'c': [1, 5]
+                }
+            ),
+            True
+        )
+
+    def test_AhoCorasick_keys_found_6(self):
+        self.assertEqual(
+            AhoCorasick(
+                ['a', 'ab', 'bab', 'bc', 'bca', 'c', 'ca', 'caa']
+            ).are_keys_found_equal_to(
+                'abcacaab',
+                {
+                    'a': [0, 3, 5, 6],
+                    'ab': [0, 6],
+                    'bc': [1],
+                    'bca': [1],
+                    'c': [2, 4],
+                    'ca': [2, 4],
+                    'caa': [4]
                 }
             ),
             True
