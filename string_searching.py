@@ -136,13 +136,13 @@ class Node:
 
 class AhoCorasick:
     """
-    Class AhoCorasick Version 2.5.0
+    Class AhoCorasick Version 2.5.1
 
     the Aho–Corasick algorithm is a string-searching algorithm invented by
     Alfred V. Aho and Margaret J. Corasick.
 
     Implemented by Pipin Fitriadi (pipinfitriadi@gmail.com) at May 19th, 2019
-    and updated at May 26th, 2019.
+    and updated at May 27th, 2019.
 
     Source: https://en.wikipedia.org/wiki/Aho%E2%80%93Corasick_algorithm
     """
@@ -224,10 +224,20 @@ class AhoCorasick:
                     node = node.suffix
                     t += 1
             elif key == text[t:t + len_key]:
-                outpout = t + len_key - 1
+                output = t + len_key - 1
+                in_keys = node.in_keys
 
-                if node.in_keys:
-                    found[key].append(outpout)
+                if in_keys:
+                    found[key].append(output)
+
+                key_suffix_found = 0
+                key_suffix = node.key_suffix
+
+                if key_suffix:
+                    while key_suffix:
+                        found[key_suffix.key].append(output)
+                        key_suffix_found += 1
+                        key_suffix = key_suffix.key_suffix
 
                 for child in node.childs:
                     key = child.key
@@ -238,10 +248,29 @@ class AhoCorasick:
                 else:
                     node = node.suffix
                     t += 1
+
+                    if key_suffix_found:
+                        if in_keys:
+                            for i in range(key_suffix_found):
+                                node = node.suffix
+
+                            t += key_suffix_found
+                        else:
+                            for child in node.childs:
+                                key = child.key
+
+                                if key == text[t:t + len(key)]:
+                                    node = child
+                                    break
+                            else:
+                                node = node.suffix
+                                t += 1
+
             else:
                 node = node.suffix
                 t += 1
 
+        # print(found)
         return found
 
     def are_keys_found_equal_to(
@@ -397,7 +426,6 @@ class Test(TestCase):
         )
 
     def test_AhoCorasick_keys_found_2(self):
-        # Perlu dipastikan apakah ini sudah benar?!
         self.assertEqual(
             AhoCorasick(
                 [
@@ -410,7 +438,7 @@ class Test(TestCase):
                     'ab': [1, 7],
                     'bc': [2],
                     'bca': [3],
-                    'c': [4],
+                    'c': [2, 4],
                     'caa': [6]
                 }
             ),
