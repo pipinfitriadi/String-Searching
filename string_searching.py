@@ -136,7 +136,7 @@ class Node:
 
 class AhoCorasick:
     """
-    Class AhoCorasick Version 2.5.2
+    Class AhoCorasick Version 2.6.0
 
     the Aho–Corasick algorithm is a string-searching algorithm invented by
     Alfred V. Aho and Margaret J. Corasick.
@@ -202,76 +202,44 @@ class AhoCorasick:
         return root['']
 
     def find_in(self, text: str) -> dict:
-        found = defaultdict(list)
-        t = 0
+        output = defaultdict(list)
         node = self.tree
 
-        while t < len(text):
+        for i, t in enumerate(text):
+            while node:
+                for child in node.childs:
+                    key = child.key
+
+                    if key[-1:] == t:
+                        if child.in_keys:
+                            output[key].append(
+                                i - len(key) + 1
+                            )
+
+                        key_suffix = child.key_suffix
+
+                        if key_suffix:
+                            while key_suffix:
+                                key = key_suffix.key
+                                output[key].append(
+                                    i - len(key) + 1
+                                )
+                                key_suffix = key_suffix.key_suffix
+
+                        node = child
+                        is_found = True
+                        break
+                else:
+                    node = node.suffix
+                    is_found = False
+
+                if is_found:
+                    break
+
             if node is None:
                 node = self.tree
 
-            key = node.key
-            len_key = len(key)
-
-            if key == '':
-                for child in node.childs:
-                    key = child.key
-
-                    if key == text[t:t + len(key)]:
-                        node = child
-                        break
-                else:
-                    node = node.suffix
-                    t += 1
-            elif key == text[t:t + len_key]:
-                output = t + len_key - 1
-                in_keys = node.in_keys
-
-                if in_keys:
-                    found[key].append(output)
-
-                key_suffix_found = 0
-                key_suffix = node.key_suffix
-
-                if key_suffix:
-                    while key_suffix:
-                        found[key_suffix.key].append(output)
-                        key_suffix_found += 1
-                        key_suffix = key_suffix.key_suffix
-
-                for child in node.childs:
-                    key = child.key
-
-                    if key == text[t:t + len(key)]:
-                        node = child
-                        break
-                else:
-                    node = node.suffix
-                    t += 1
-
-                    if key_suffix_found:
-                        if in_keys:
-                            for i in range(key_suffix_found):
-                                node = node.suffix
-
-                            t += key_suffix_found
-                        else:
-                            for child in node.childs:
-                                key = child.key
-
-                                if key == text[t:t + len(key)]:
-                                    node = child
-                                    break
-                            else:
-                                node = node.suffix
-                                t += 1
-
-            else:
-                node = node.suffix
-                t += 1
-
-        # print(found)
-        return found
+        return output
 
     def are_keys_found_equal_to(
         self,
