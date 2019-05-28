@@ -1,79 +1,234 @@
 #!/usr/bin/env python3
 
 """
+MIT License
+
+Copyright (c) 2019 Pipin Fitriadi
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+"""
+
+from collections import defaultdict
+from unittest import main, TestCase
+
+"""
 Hackerrank: Determining DNA Health
 URL: https://www.hackerrank.com/challenges/determining-dna-health/problem
 
 Try to be solved by Pipin Fitriadi (pipinfitriadi@gmail.com) at May 21th 2019,
-updated at May 25th 2019.
+updated at May 28th 2019.
 """
 
-from collections import defaultdict
 
-if __name__ == '__main__':
-    with open('../input0.txt', 'r') as f:
-        test_case = f.readlines()
+class Node:
+    def __init__(
+        self,
+        key='',
+        in_keys=False,
+        suffix=None,
+        key_suffix=None,
+        health=0
+    ):
+        self.key = key
+        self.in_keys = in_keys
+        self.suffix: Node = suffix
+        self.key_suffix: Node = key_suffix
+        self.childs = set()
+        self.health = health
+
+
+class AhoCorasick:
+    def __init__(self, keys: list):
+        self.tree = self.build_tree(keys)
+
+    def build_tree(self, keys: list) -> Node:
+        keys = sorted(keys)
+        root = {}
+        root[''] = Node()
+        keys_name = [key for key, _ in keys]
+
+        for key, health in keys:
+            for k in range(
+                len(key)
+            ):
+                current_key = key[:k+1]
+
+                if current_key not in root:
+                    root[current_key] = Node(
+                        current_key,
+                        current_key in keys_name
+                    )
+
+                if key == current_key:
+                    root[current_key].health = health
+
+                parent_key = current_key[:-1]
+
+                if parent_key not in root:
+                    root[parent_key] = Node(
+                        parent_key,
+                        parent_key in keys_name
+                    )
+
+                if key == parent_key:
+                    root[current_key].health = health
+
+                root[parent_key].childs.add(
+                    root[current_key]
+                )
+
+        for key in root:
+            for k in range(
+                len(key)
+            ):
+                suffix = key[k+1:]
+
+                if suffix in root:
+                    root[key].suffix = root[suffix]
+
+                    for s in range(
+                        len(suffix)
+                    ):
+                        key_suffix = suffix[s:]
+
+                        if key_suffix in keys_name:
+                            root[key].key_suffix = root[key_suffix]
+                            break
+
+                    break
+
+        return root['']
+
+    def find_in(self, text: str) -> dict:
+        output = 0
+        node = self.tree
+
+        for i, t in enumerate(text):
+            while node:
+                for child in node.childs:
+                    key = child.key
+
+                    if key[-1:] == t:
+                        if child.in_keys:
+                            output += child.health
+
+                        key_suffix = child.key_suffix
+
+                        if key_suffix:
+                            while key_suffix:
+                                key = key_suffix.key
+                                output += key_suffix.health
+                                key_suffix = key_suffix.key_suffix
+
+                        node = child
+                        is_found = True
+                        break
+                else:
+                    node = node.suffix
+                    is_found = False
+
+                if is_found:
+                    break
+            else:
+                node = self.tree
+
+        return output
+
+
+def min_max_dna_health(file_path: str) -> tuple:
+    with open(file_path, 'r') as content:
+        lines = content.readlines()
 
     genes = list(
         map(
             tuple,
             zip(
-                test_case[1].rstrip().split(),
+                lines[1].rstrip().split(),
                 list(
                     map(
                         int,
-                        test_case[2].rstrip().split()
+                        lines[2].rstrip().split()
                     )
                 )
             )
         )
     )
-    # min_health = -1
-    # max_health = -1
+    min_health = -1
+    max_health = -1
 
     for s_itr in range(
         int(
-            test_case[3]
+            lines[3]
         )
     ):
-        first_last_d = test_case[s_itr + 4].split()
-        first = int(
-            first_last_d[0]
+        first_last_d = lines[s_itr + 4].split()
+        s_gene = defaultdict(int)
+
+        for gene, health in genes[
+            int(
+                first_last_d[0]
+            ):int(
+                first_last_d[1]
+            ) + 1
+        ]:
+            s_gene[gene] += health
+
+        total_health = AhoCorasick(
+            s_gene.items()
+        ).find_in(
+            first_last_d[2]
         )
-        last = int(
-            first_last_d[1]
+
+        if min_health == -1 or total_health < min_health:
+            min_health = total_health
+
+        if max_health == -1 or total_health > max_health:
+            max_health = total_health
+
+    return min_health, max_health
+
+
+class Test(TestCase):
+    def test_1(self):
+        self.assertEqual(
+            min_max_dna_health('../input00.txt'),
+            (0, 19)
         )
-        d = first_last_d[2]
-    #     total_health = 0
-        dna_gene = defaultdict(int)
 
-        for gene, health in genes[first:last + 1]:
-            dna_gene[gene] += health
+    def test_2(self):
+        self.assertEqual(
+            min_max_dna_health('../input01.txt'),
+            (3218660, 11137051)
+        )
 
-        dna_gene = dna_gene.items()
+    # def test_3(self):
+    #     self.assertEqual(
+    #         min_max_dna_health('../input13.txt'),
+    #         (40124729287, 61265329670)
+    #     )
 
-    #     for g in set(dna_gene):
-    #         gene_health = 0
+    # def test_4(self):
+    #     self.assertEqual(
+    #         min_max_dna_health('../input30.txt'),
+    #         (12317773616, 12317773616)
+    #     )
 
-    #         for k, v in enumerate(gene):
-    #             if v == g:
-    #                 gene_health += health[k+first]
 
-    #         found = 0
-    #         dummy_d = d[found:]
-
-    #         while found != -1 and found < len(dummy_d):
-    #             found = dummy_d.find(g)
-
-    #             if found != -1:
-    #                 total_health += gene_health
-    #                 found += 1
-    #                 dummy_d = dummy_d[found:]
-
-    #     if min_health == -1 or total_health < min_health:
-    #         min_health = total_health
-
-    #     if max_health == -1 or total_health > max_health:
-    #         max_health = total_health
-
-    # print(min_health, max_health)
+if __name__ == '__main__':
+    main()
