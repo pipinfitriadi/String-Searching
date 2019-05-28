@@ -136,7 +136,7 @@ class Node:
 
 class AhoCorasick:
     """
-    Class AhoCorasick Version 2.6.0
+    Class AhoCorasick Version 2.6.1
 
     the Aho–Corasick algorithm is a string-searching algorithm invented by
     Alfred V. Aho and Margaret J. Corasick.
@@ -235,8 +235,7 @@ class AhoCorasick:
 
                 if is_found:
                     break
-
-            if node is None:
+            else:
                 node = self.tree
 
         return output
