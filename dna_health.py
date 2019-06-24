@@ -230,5 +230,108 @@ class Test(TestCase):
     #     )
 
 
+from time import time
+
+
+def timer_genes_1(file_path: str):
+    with open(file_path, 'r') as content:
+        lines = content.readlines()
+
+    t0 = time()
+    genes = list(
+        map(
+            tuple,
+            zip(
+                lines[1].rstrip().split(),
+                list(
+                    map(
+                        int,
+                        lines[2].rstrip().split()
+                    )
+                )
+            )
+        )
+    )
+    t1 = time()
+    return t1 - t0
+
+
+def timer_genes_2(file_path: str):
+    with open(file_path, 'r') as content:
+        lines = content.readlines()
+
+    t0 = time()
+    genes = lines[1].rstrip().split()
+    health = list(
+        map(
+            int,
+            lines[2].rstrip().split()
+        )
+    )
+    genes = list(
+        map(
+            tuple,
+            zip(
+                genes,
+                health
+            )
+        )
+    )
+    t1 = time()
+    return t1 - t0
+
+
+def timer_genes_3(file_path: str):
+    with open(file_path, 'r') as content:
+        lines = content.readlines()
+
+    t0 = time()
+    genes = lines[1].rstrip().split()
+    healths = list(map(int, lines[2].rstrip().split()))
+    gMap = defaultdict(lambda: [[], [0]])
+    subs = set()
+
+    for id, gene in enumerate(genes):
+        gMap[gene][0].append(id)
+
+        for j in range(1, min(len(gene), 500)+1):
+            subs.add(gene[:j])
+
+    for v in gMap.values():
+        for i, ix in enumerate(v[0]):
+            v[1].append(v[1][i]+healths[ix])
+    t1 = time()
+    return t1 - t0
+
+def run_test():
+    for i in ['00', '01', '13', '30']:
+        path = f'../input{i}.txt'
+        tg1 = timer_genes_1(path)
+        tg2 = timer_genes_2(path)
+        tg3 = timer_genes_3(path)
+
+        if tg1 <= tg2:
+            if tg1 <= tg3:
+                print('tg1')
+            else:
+                print('tg3')
+        else:
+            if tg2 <= tg3:
+                print('tg2')
+            else:
+                print('tg3')
+
+        print()
+
 if __name__ == '__main__':
-    main()
+    # main()
+
+    import os
+
+    os.chdir(
+        os.path.dirname(
+            os.path.abspath(__file__)
+        )
+    )
+
+    run_test()
